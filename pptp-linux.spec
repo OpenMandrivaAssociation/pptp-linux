@@ -1,7 +1,11 @@
+%define name pptp-linux
+%define version 1.7.1
+%define release %mkrel 2
+
 Summary:	PPTP-linux VPN client 
-Name:		pptp-linux
-Version:	1.7.1
-Release:	1mdk
+Name:		%{name}
+Version:	%{version}
+Release:	%{release}
 License:	GPL
 Group:		Networking/Other
 
@@ -14,7 +18,6 @@ Source5:	pptp.initd
 
 URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
-Requires(pre):	chkconfig rpm-helper
 Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Conflicts:	pptp-adsl-alcatel
 Obsoletes:	pptp-client
