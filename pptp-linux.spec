@@ -18,7 +18,6 @@ Source5:	pptp.initd
 
 URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Conflicts:	pptp-adsl-alcatel
 Obsoletes:	pptp-client
 Provides:	pptp-client
