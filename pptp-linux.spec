@@ -1,11 +1,10 @@
 %define name pptp-linux
 %define version 1.7.1
-%define release %mkrel 2
 
 Summary:	PPTP-linux VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	%{release}
+Release:	%mkrel 3
 License:	GPL
 Group:		Networking/Other
 
