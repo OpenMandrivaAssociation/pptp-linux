@@ -1,14 +1,14 @@
 %define name pptp-linux
-%define version 1.7.1
+%define version 1.7.2
 
 Summary:	PPTP-linux VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	%mkrel 4
-License:	GPL
+Release:	%mkrel 1
+License:	GPLv2+
 Group:		Networking/Other
 
-Source0:	http://prdownloads.sourceforge.net/pptpclient/pptp-%{version}.tar.bz2
+Source0:	http://prdownloads.sourceforge.net/pptpclient/pptp-%{version}.tar.gz
 Source1: 	pptp-command
 Source2: 	options.pptp
 Source3: 	pptp_fe.pl
