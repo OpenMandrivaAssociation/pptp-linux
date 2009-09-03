@@ -4,7 +4,7 @@
 Summary:	PPTP-linux VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPLv2+
 Group:		Networking/Other
 
