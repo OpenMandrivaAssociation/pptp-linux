@@ -4,7 +4,7 @@
 Summary:	PPTP-linux VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPLv2+
 Group:		Networking/Other
 
@@ -14,6 +14,7 @@ Source2: 	options.pptp
 Source3: 	pptp_fe.pl
 Source4: 	xpptp_fe.pl
 Source5:	pptp.initd
+Patch0: 	pptp-1.7.2-fix-ip-path.patch
 
 URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
@@ -31,6 +32,7 @@ on tunnelling PPTP through Linux firewalls.
 
 %prep
 %setup -q -n pptp-%{version}
+%patch0 -p1 -b .ip-path
 
 %build
 %make OPTIMIZE="$RPM_OPT_FLAGS" DEBUG=""
