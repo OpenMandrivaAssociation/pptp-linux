@@ -38,18 +38,18 @@ on tunnelling PPTP through Linux firewalls.
 %make OPTIMIZE="$RPM_OPT_FLAGS" DEBUG=""
 
 %install
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
-install -m755 pptp -D $RPM_BUILD_ROOT%{_sbindir}/pptp
-install -m755 %{SOURCE1} -D $RPM_BUILD_ROOT%{_sbindir}/pptp-command
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/pptp.d
-install -m644 %{SOURCE2} -D $RPM_BUILD_ROOT%{_sysconfdir}/ppp/options.pptp
-install -m644 pptp.8 -D $RPM_BUILD_ROOT%{_mandir}/man8/pptp.8
-install -d $RPM_BUILD_ROOT%{_initrddir}
-install -m755 %{SOURCE5} -D $RPM_BUILD_ROOT%{_initrddir}/pptp
+install -m755 pptp -D %{buildroot}%{_sbindir}/pptp
+install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
+install -d %{buildroot}%{_sysconfdir}/pptp.d
+install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/ppp/options.pptp
+install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
+install -d %{buildroot}%{_initrddir}
+install -m755 %{SOURCE5} -D %{buildroot}%{_initrddir}/pptp
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %post
 %_post_service pptp
