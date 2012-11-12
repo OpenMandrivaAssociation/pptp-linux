@@ -1,0 +1,7 @@
+sources:
+  "options.pptp:"	689f925569fe766d5b4fa8405fa594e80e378f3c
+  "pptp-1.7.2.tar.gz:"	1007eb1d4d21629fab390903e8b394d6157b4983
+  "pptp-command:"	d7610de2b60ccfbd62073643aad0d59462660544
+  "pptp_fe.pl:"	a0d7acf60c13f53c80ca2f264cd1b3885b460ad1
+  "pptp.initd:"	79f53f927f72d3d910742948d108b557c3b9898b
+  "xpptp_fe.pl:"	daa93d61ca95c339990627af24d0a53c11c6de75
