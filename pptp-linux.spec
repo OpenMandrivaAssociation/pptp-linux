@@ -1,7 +1,7 @@
 %define name pptp-linux
 %define version 1.7.2
 
-Summary:	PPTP-linux VPN client 
+Summary:	VPN client 
 Name:		%{name}
 Version:	%{version}
 Release:	%mkrel 7
