@@ -4,7 +4,7 @@
 Summary:	VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	%mkrel 7
+Release:	8
 License:	GPLv2+
 Group:		Networking/Other
 
@@ -18,7 +18,6 @@ Patch0: 	pptp-1.7.2-fix-ip-path.patch
 
 URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
-Buildroot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Conflicts:	pptp-adsl-alcatel
 Obsoletes:	pptp-client
 Provides:	pptp-client
@@ -35,21 +34,19 @@ on tunnelling PPTP through Linux firewalls.
 %patch0 -p1 -b .ip-path
 
 %build
-%make OPTIMIZE="$RPM_OPT_FLAGS" DEBUG=""
+%make OPTIMIZE="%{optflags}" DEBUG=""
 
 %install
-rm -rf $RPM_BUILD_ROOT
 
-install -m755 pptp -D $RPM_BUILD_ROOT%{_sbindir}/pptp
-install -m755 %{SOURCE1} -D $RPM_BUILD_ROOT%{_sbindir}/pptp-command
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/pptp.d
-install -m644 %{SOURCE2} -D $RPM_BUILD_ROOT%{_sysconfdir}/ppp/options.pptp
-install -m644 pptp.8 -D $RPM_BUILD_ROOT%{_mandir}/man8/pptp.8
-install -d $RPM_BUILD_ROOT%{_initrddir}
-install -m755 %{SOURCE5} -D $RPM_BUILD_ROOT%{_initrddir}/pptp
+install -m755 pptp -D %{buildroot}%{_sbindir}/pptp
+install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
+install -d %{buildroot}%{_sysconfdir}/pptp.d
+install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/ppp/options.pptp
+install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
+install -d %{buildroot}%{_initrddir}
+install -m755 %{SOURCE5} -D %{buildroot}%{_initrddir}/pptp
 
 %clean
-rm -rf $RPM_BUILD_ROOT
 
 %post
 %_post_service pptp
