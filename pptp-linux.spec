@@ -14,7 +14,29 @@ Source2: 	options.pptp
 Source3: 	pptp_fe.pl
 Source4: 	xpptp_fe.pl
 Source5:	pptp.initd
-Patch0: 	pptp-1.7.2-fix-ip-path.patch
+Source6:	pptp-tmpfs.conf
+Patch0:		pptp-1.7.2-compat.patch
+Patch1:		pptp-1.7.2-ip-path.patch
+Patch2:		pptp-1.7.2-pptpsetup.patch
+Patch3:		pptp-1.7.2-makedeps.patch
+Patch4:		pptp-1.7.2-pptpsetup-encrypt.patch
+Patch5:		pptp-1.7.2-pptpsetup-mppe.patch
+Patch6:		pptp-1.7.2-waitpid.patch
+Patch7:		pptp-1.7.2-conn-free.patch
+Patch8:		pptp-1.7.2-conn-free2.patch
+Patch9:		pptp-1.7.2-call-disconnect-notify.patch
+Patch10:	pptp-1.7.2-so_mark.patch
+Patch11:	pptp-1.7.2-nohostroute-option.patch
+Patch12:	pptp-1.7.2-parallel-build.patch
+Patch13:	pptp-1.7.2-fsf-update.patch
+Patch14:	pptp-1.7.2-sign-compare.patch
+Patch15:	pptp-1.7.2-const.patch
+Patch16:	pptp-1.7.2-field-init.patch
+Patch17:	pptp-1.7.2-unused.patch
+Patch18:	pptp-1.7.2-prototype.patch
+Patch19:	pptp-1.7.2-nested-externs.patch
+Patch20:	pptp-1.7.2-aliasing.patch
+Patch21:	pptp-1.7.2-options.pptp.patch
 
 URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
@@ -29,14 +51,95 @@ but have not yet been performed). See the IPfwd page
 (http://www.pdos.lcs.mit.edu/~cananian/Projects/IPfwd) for information
 on tunnelling PPTP through Linux firewalls.
 
+%package setup
+Summary:	PPTP Tunnel Configuration Script
+Group:		Networking/Other
+Requires:	%{name} = %{version}-%{release}
+
+%description setup
+This package provides a simple configuration script for setting up PPTP
+tunnels.
+
 %prep
 %setup -q -n pptp-%{version}
-%patch0 -p1 -b .ip-path
+# Remove reference to stropts.h, not shipped in F9 onwards (applied upstream)
+%patch0 -p0 -b .compat
+
+# Make location of "ip" binary build-time configurable (applied upstream)
+%patch1 -p0 -b .ip-path
+
+# Retain permissions on /etc/ppp/chap-secrets (#492090, applied upstream)
+%patch2 -p0 -b .bz492090
+
+# Fix Makefile dependencies to support parallel make (applied upstream)
+%patch3 -p0 -b .makedeps
+%patch12 -p0 -b .parallel
+
+# Don't check for MPPE capability in kernel or pppd unless we're creating a
+# tunnel that requires encryption (applied upstream)
+%patch4 -p0 -b .encrypt
+
+# Don't check for MPPE capability in kernel and pppd at all because current
+# Fedora releases and EL ≥ 5 include MPPE support out of the box (#502967)
+%patch5 -p1 -b .mppe
+
+# Fix waitpid usage (upstream patch)
+%patch6 -p0 -b .waitpid
+
+# Move free of connection struct out of main loop (upstream patch)
+%patch7 -p0 -b .conn-free
+
+# Avoid using connection struct after it is freed (upstream patch)
+%patch8 -p0 -b .conn-free2
+
+# Add call ID of outgoing call so that Call-Disconnect-Notify from peer causes
+# correct disconnection sequence (upstream patch)
+%patch9 -p1 -b .cdn
+
+# Add support for setting SO_MARK for the PPTP TCP control connection as well
+# as on the GRE packets (upstream patch)
+%patch10 -p1 -b .so_mark
+
+# Implement the --nohostroute option that routing.c talks about (upstream patch)
+%patch11 -p1 -b .nohostroute
+
+# Update the FSF address references and GPLv2 license text (upstream patch)
+%patch13 -p0 -b .fsf
+
+# Fix comparisons between signed and unsigned integers (upstream patch)
+%patch14 -p1 -b .sign-compare
+
+# Fix const usage (upstream patch)
+%patch15 -p1 -b .const
+
+# Add missing field initializers (upstream patch)
+%patch16 -p1 -b .field
+
+# Suppress warnings about possibly unused variables (upstream patch)
+%patch17 -p1 -b .unused
+
+# Fix declarations that are not prototypes (upstream patch)
+%patch18 -p1 -b .prototype
+
+# Fix warnings about nested externs (upstream patch)
+%patch19 -p1 -b .nested
+
+# Fix aliasing issues (upstream patch)
+%patch20 -p1 -b .alias
+
+# Additional commentary in options.pptp regarding encryption (upstream patch)
+%patch21 -b .options-comments
+
+# Pacify rpmlint
+perl -pi -e 's/install -o root -m 555 pptp/install -m 755 pptp/;' Makefile
 
 %build
-%make OPTIMIZE="%{optflags}" DEBUG=""
+OUR_CFLAGS="-Wall %{optflags} -Wextra -Wstrict-aliasing=2 -Wnested-externs -Wstrict-prototypes"
+%make CFLAGS="$OUR_CFLAGS" IP=/sbin/ip
 
 %install
+make DESTDIR=%{buildroot} install
+install -d -m 750 %{buildroot}%{_localstatedir}/run/pptp
 
 install -m755 pptp -D %{buildroot}%{_sbindir}/pptp
 install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
@@ -45,108 +148,26 @@ install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/ppp/options.pptp
 install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
 install -d %{buildroot}%{_initrddir}
 install -m755 %{SOURCE5} -D %{buildroot}%{_initrddir}/pptp
-
-%clean
+install -d -m 755 %{buildroot}%{_prefix}/lib/tmpfiles.d
+install -p -m 644 %{SOURCE1} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 
 %post
+%tmpfiles_create pptp
 %_post_service pptp
 
 %preun
 %_preun_service pptp
 
 %files
-%defattr (-,root,root)
 %doc AUTHORS NEWS README TODO USING Documentation/[D,P]*
-%{_sbindir}/*
+%{_sbindir}/pptp-*
+%{_sbindir}/pptp
 %{_initrddir}/pptp
 %{_mandir}/man8/pptp.8*
+%{_prefix}/lib/tmpfiles.d/pptp.conf
 %config(noreplace) %attr(0600,root,root) %{_sysconfdir}/ppp/options.pptp
 %attr(0755,root,root) %dir %{_sysconfdir}/pptp.d
 
-
-
-%changelog
-* Thu May 05 2011 Oden Eriksson <oeriksson@mandriva.com> 1.7.2-6mdv2011.0
-+ Revision: 667819
-- mass rebuild
-
-* Fri Dec 03 2010 Oden Eriksson <oeriksson@mandriva.com> 1.7.2-5mdv2011.0
-+ Revision: 607204
-- rebuild
-
-* Sun Jan 31 2010 Luc Menut <lmenut@mandriva.org> 1.7.2-4mdv2010.1
-+ Revision: 498662
-- patch0: fix ip path (mdv bug #51704)
-
-* Thu Sep 03 2009 Christophe Fergeau <cfergeau@mandriva.com> 1.7.2-3mdv2010.0
-+ Revision: 426778
-- rebuild
-
-* Sat Mar 07 2009 Antoine Ginies <aginies@mandriva.com> 1.7.2-2mdv2009.1
-+ Revision: 351630
-- rebuild
-
-* Tue Aug 12 2008 Emmanuel Andry <eandry@mandriva.org> 1.7.2-1mdv2009.0
-+ Revision: 271120
-- New version
-- Fix license
-
-* Wed Jun 18 2008 Thierry Vignaud <tv@mandriva.org> 1.7.1-4mdv2009.0
-+ Revision: 225045
-- rebuild
-
-* Tue Mar 04 2008 Oden Eriksson <oeriksson@mandriva.com> 1.7.1-3mdv2008.1
-+ Revision: 179259
-- rebuild
-
-  + Olivier Blin <oblin@mandriva.com>
-    - restore BuildRoot
-
-  + Thierry Vignaud <tv@mandriva.org>
-    - kill re-definition of %%buildroot on Pixel's request
-
-* Fri Jun 08 2007 Adam Williamson <awilliamson@mandriva.org> 1.7.1-2mdv2008.0
-+ Revision: 37056
-- clean spec, rebuild for new era
-
-
-* Wed Mar 08 2006 Stew Benedict <sbenedict@mandriva.com> 1.7.1-1mdk
-- 1.7.1
-
-* Thu Dec 22 2005 Stew Benedict <sbenedict@mandriva.com> 1.7.0-2mdk
-- replace symlink with real init script (#20267, S3)
-- modprobe ppp-compress-18 in the init script
-- add "refuse-eap" to options.pptp
-- kill pppd rather than pptp for a cleaner interaction with "service"
-  (modified pptp-command)
-
-* Tue Oct 04 2005 Stew Benedict <sbenedict@mandriva.com> 1.7.0-1mdk
-- New release 1.7.0
-
-* Tue Jun 21 2005 Stew Benedict <sbenedict@mandriva.com> 1.6.0-2mdk
-- add stateless to options.pptp, new syntax for other mppe options (#16501)
-- fix pptp initscript symlink removed in 1.5.0-2mdk (#16499)
-
-* Wed Apr 27 2005 Olivier Blin <oblin@mandriva.com> 1.6.0-1mdk
-- 1.6.0
-
-* Tue Jan 18 2005 Per Øyvind Karlsen <peroyvind@linux-mandrake.com> 1.5.0-2mdk
-- update options.pptp (S2)  for new pppd
-- compile with $RPM_OPT_FLAGS and without -g flag
-- cleanups!
-
-* Mon Jul 05 2004 Olivier Blin <blino@mandrake.org> 1.5.0-1mdk
-- 1.5.0
-
-* Wed May 26 2004 Thierry Vignaud <tvignaud@mandrakesoft.com> 1.4.0-2mdk
-- fix requires
-
-* Tue May 25 2004 Stew Benedict <sbenedict@mandrakesoft.com> 1.4.0-1mdk
-- 1.4.0, fix options.pptp for pppd 2.4.2 (#9376)
-
-* Wed Jul 02 2003 Stew Benedict <sbenedict@mandrakesoft.com> 1.3.1-1mdk
-- 1.3.1
-
-* Fri Apr 04 2003 Stew Benedict <sbenedict@mandrakesoft.com> 1.2.0-1mdk
-- 1.2.0
-
+%files setup
+%{_sbindir}/pptpsetup
+%{_mandir}/man8/pptpsetup.8*
