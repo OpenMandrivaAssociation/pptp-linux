@@ -7,12 +7,12 @@ Version:	%{version}
 Release:	8
 License:	GPLv2+
 Group:		Networking/Other
-
+Url:		http://pptpclient.sourceforge.net/
 Source0:	http://prdownloads.sourceforge.net/pptpclient/pptp-%{version}.tar.gz
-Source1: 	pptp-command
-Source2: 	options.pptp
-Source3: 	pptp_fe.pl
-Source4: 	xpptp_fe.pl
+Source1:	pptp-command
+Source2:	options.pptp
+Source3:	pptp_fe.pl
+Source4:	xpptp_fe.pl
 Source5:	pptp.initd
 Source6:	pptp-tmpfs.conf
 Patch0:		pptp-1.7.2-compat.patch
@@ -37,12 +37,9 @@ Patch18:	pptp-1.7.2-prototype.patch
 Patch19:	pptp-1.7.2-nested-externs.patch
 Patch20:	pptp-1.7.2-aliasing.patch
 Patch21:	pptp-1.7.2-options.pptp.patch
-
-URL:		http://pptpclient.sourceforge.net/
 Requires:	ppp >= 2.4.3
 Conflicts:	pptp-adsl-alcatel
-Obsoletes:	pptp-client
-Provides:	pptp-client
+%rename		pptp-client
 
 %description
 PPTP-linux allows you to connect to a PPTP server from a Linux or other
@@ -61,7 +58,7 @@ This package provides a simple configuration script for setting up PPTP
 tunnels.
 
 %prep
-%setup -q -n pptp-%{version}
+%setup -qn pptp-%{version}
 # Remove reference to stropts.h, not shipped in F9 onwards (applied upstream)
 %patch0 -p0 -b .compat
 
@@ -171,3 +168,4 @@ install -p -m 644 %{SOURCE1} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 %files setup
 %{_sbindir}/pptpsetup
 %{_mandir}/man8/pptpsetup.8*
+
