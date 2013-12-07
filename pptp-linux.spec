@@ -4,7 +4,7 @@
 Summary:	VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	10
+Release:	11
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
