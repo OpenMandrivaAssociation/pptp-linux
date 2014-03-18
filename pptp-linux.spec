@@ -4,7 +4,7 @@
 Summary:	VPN client 
 Name:		%{name}
 Version:	%{version}
-Release:	12
+Release:	13
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
@@ -146,7 +146,7 @@ install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
 install -d %{buildroot}%{_initrddir}
 install -m755 %{SOURCE5} -D %{buildroot}%{_initrddir}/pptp
 install -d -m 755 %{buildroot}%{_prefix}/lib/tmpfiles.d
-install -p -m 644 %{SOURCE1} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
+install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 
 %post
 %tmpfiles_create pptp
