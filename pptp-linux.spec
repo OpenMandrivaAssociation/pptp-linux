@@ -1,10 +1,9 @@
 %define name pptp-linux
-%define version 1.7.2
 
 Summary:	VPN client 
-Name:		%{name}
-Version:	%{version}
-Release:	13
+Name:		pptp-linux
+Version:	1.8.0
+Release:	1
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
@@ -15,28 +14,8 @@ Source3:	pptp_fe.pl
 Source4:	xpptp_fe.pl
 Source5:	pptp.initd
 Source6:	pptp-tmpfs.conf
-Patch0:		pptp-1.7.2-compat.patch
-Patch1:		pptp-1.7.2-ip-path.patch
-Patch2:		pptp-1.7.2-pptpsetup.patch
-Patch3:		pptp-1.7.2-makedeps.patch
-Patch4:		pptp-1.7.2-pptpsetup-encrypt.patch
-Patch5:		pptp-1.7.2-pptpsetup-mppe.patch
-Patch6:		pptp-1.7.2-waitpid.patch
-Patch7:		pptp-1.7.2-conn-free.patch
-Patch8:		pptp-1.7.2-conn-free2.patch
-Patch9:		pptp-1.7.2-call-disconnect-notify.patch
-Patch10:	pptp-1.7.2-so_mark.patch
-Patch11:	pptp-1.7.2-nohostroute-option.patch
-Patch12:	pptp-1.7.2-parallel-build.patch
-Patch13:	pptp-1.7.2-fsf-update.patch
-Patch14:	pptp-1.7.2-sign-compare.patch
-Patch15:	pptp-1.7.2-const.patch
-Patch16:	pptp-1.7.2-field-init.patch
-Patch17:	pptp-1.7.2-unused.patch
-Patch18:	pptp-1.7.2-prototype.patch
-Patch19:	pptp-1.7.2-nested-externs.patch
-Patch20:	pptp-1.7.2-aliasing.patch
-Patch21:	pptp-1.7.2-options.pptp.patch
+
+Patch0:		pptp-1.7.2-pptpsetup-mppe.patch
 Requires:	ppp >= 2.4.3
 Conflicts:	pptp-adsl-alcatel
 %rename		pptp-client
@@ -59,73 +38,7 @@ tunnels.
 
 %prep
 %setup -qn pptp-%{version}
-# Remove reference to stropts.h, not shipped in F9 onwards (applied upstream)
-%patch0 -p0 -b .compat
-
-# Make location of "ip" binary build-time configurable (applied upstream)
-%patch1 -p0 -b .ip-path
-
-# Retain permissions on /etc/ppp/chap-secrets (#492090, applied upstream)
-%patch2 -p0 -b .bz492090
-
-# Fix Makefile dependencies to support parallel make (applied upstream)
-%patch3 -p0 -b .makedeps
-%patch12 -p0 -b .parallel
-
-# Don't check for MPPE capability in kernel or pppd unless we're creating a
-# tunnel that requires encryption (applied upstream)
-%patch4 -p0 -b .encrypt
-
-# Don't check for MPPE capability in kernel and pppd at all because current
-# Fedora releases and EL ≥ 5 include MPPE support out of the box (#502967)
-%patch5 -p1 -b .mppe
-
-# Fix waitpid usage (upstream patch)
-%patch6 -p0 -b .waitpid
-
-# Move free of connection struct out of main loop (upstream patch)
-%patch7 -p0 -b .conn-free
-
-# Avoid using connection struct after it is freed (upstream patch)
-%patch8 -p0 -b .conn-free2
-
-# Add call ID of outgoing call so that Call-Disconnect-Notify from peer causes
-# correct disconnection sequence (upstream patch)
-%patch9 -p1 -b .cdn
-
-# Add support for setting SO_MARK for the PPTP TCP control connection as well
-# as on the GRE packets (upstream patch)
-%patch10 -p1 -b .so_mark
-
-# Implement the --nohostroute option that routing.c talks about (upstream patch)
-%patch11 -p1 -b .nohostroute
-
-# Update the FSF address references and GPLv2 license text (upstream patch)
-%patch13 -p0 -b .fsf
-
-# Fix comparisons between signed and unsigned integers (upstream patch)
-%patch14 -p1 -b .sign-compare
-
-# Fix const usage (upstream patch)
-%patch15 -p1 -b .const
-
-# Add missing field initializers (upstream patch)
-%patch16 -p1 -b .field
-
-# Suppress warnings about possibly unused variables (upstream patch)
-%patch17 -p1 -b .unused
-
-# Fix declarations that are not prototypes (upstream patch)
-%patch18 -p1 -b .prototype
-
-# Fix warnings about nested externs (upstream patch)
-%patch19 -p1 -b .nested
-
-# Fix aliasing issues (upstream patch)
-%patch20 -p1 -b .alias
-
-# Additional commentary in options.pptp regarding encryption (upstream patch)
-%patch21 -b .options-comments
+%apply_patches
 
 # Pacify rpmlint
 perl -pi -e 's/install -o root -m 555 pptp/install -m 755 pptp/;' Makefile
@@ -135,7 +48,7 @@ OUR_CFLAGS="-Wall %{optflags} -Wextra -Wstrict-aliasing=2 -Wnested-externs -Wstr
 %make CFLAGS="$OUR_CFLAGS" IP=/sbin/ip
 
 %install
-make DESTDIR=%{buildroot} install
+%makeinstall_std
 install -d -m 750 %{buildroot}%{_localstatedir}/run/pptp
 
 install -m755 pptp -D %{buildroot}%{_sbindir}/pptp
