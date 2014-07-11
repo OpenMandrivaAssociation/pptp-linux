@@ -3,7 +3,7 @@
 Summary:	VPN client 
 Name:		pptp-linux
 Version:	1.8.0
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
