@@ -1,4 +1,5 @@
 %define name pptp-linux
+%define debug_package %{nil}
 
 Summary:	VPN client 
 Name:		pptp-linux
