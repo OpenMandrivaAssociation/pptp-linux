@@ -14,8 +14,6 @@ Source2:	options.pptp
 Source3:	pptp_fe.pl
 Source4:	xpptp_fe.pl
 Source6:	pptp-tmpfs.conf
-
-Patch0:		pptp-1.7.2-pptpsetup-mppe.patch
 Requires:	ppp >= 2.4.3
 Conflicts:	pptp-adsl-alcatel
 %rename		pptp-client
