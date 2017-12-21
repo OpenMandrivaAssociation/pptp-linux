@@ -1,4 +1,2 @@
-removed_sources:
-  pptp-1.7.2.tar.gz: 1007eb1d4d21629fab390903e8b394d6157b4983
 sources:
-  pptp-1.8.0.tar.gz: 6289953812ac986c7234e83aefb10b5e279dc613
+  pptp-1.9.0.tar.gz: 047bb9812be477b44c94ffb1dc95c34658eedc24
