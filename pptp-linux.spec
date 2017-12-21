@@ -3,8 +3,8 @@
 
 Summary:	VPN client 
 Name:		pptp-linux
-Version:	1.8.0
-Release:	8
+Version:	1.9.0
+Release:	1
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
@@ -13,10 +13,7 @@ Source1:	pptp-command
 Source2:	options.pptp
 Source3:	pptp_fe.pl
 Source4:	xpptp_fe.pl
-Source5:	pptp.initd
 Source6:	pptp-tmpfs.conf
-
-Patch0:		pptp-1.7.2-pptpsetup-mppe.patch
 Requires:	ppp >= 2.4.3
 Conflicts:	pptp-adsl-alcatel
 %rename		pptp-client
@@ -57,23 +54,13 @@ install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
 install -d %{buildroot}%{_sysconfdir}/pptp.d
 install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/ppp/options.pptp
 install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
-install -d %{buildroot}%{_initrddir}
-install -m755 %{SOURCE5} -D %{buildroot}%{_initrddir}/pptp
 install -d -m 755 %{buildroot}%{_prefix}/lib/tmpfiles.d
 install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
-
-%post
-%tmpfiles_create pptp
-%_post_service pptp
-
-%preun
-%_preun_service pptp
 
 %files
 %doc AUTHORS NEWS README TODO USING Documentation/[D,P]*
 %{_sbindir}/pptp-*
 %{_sbindir}/pptp
-%{_initrddir}/pptp
 %{_mandir}/man8/pptp.8*
 %{_prefix}/lib/tmpfiles.d/pptp.conf
 %config(noreplace) %attr(0600,root,root) %{_sysconfdir}/ppp/options.pptp
@@ -82,4 +69,3 @@ install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 %files setup
 %{_sbindir}/pptpsetup
 %{_mandir}/man8/pptpsetup.8*
-
