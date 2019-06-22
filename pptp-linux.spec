@@ -4,7 +4,7 @@
 Summary:	VPN client 
 Name:		pptp-linux
 Version:	1.10.0
-Release:	2
+Release:	3
 License:	GPLv2+
 Group:		Networking/Other
 Url:		http://pptpclient.sourceforge.net/
@@ -24,6 +24,15 @@ Unix box (ports of pptp-linuxto other Unix variants should be trivial,
 but have not yet been performed). See the IPfwd page
 (http://www.pdos.lcs.mit.edu/~cananian/Projects/IPfwd) for information
 on tunnelling PPTP through Linux firewalls.
+
+%package -n pptp-command
+Summary:	PPTP Tunnel Command Line Script
+Group:		Networking/Other
+Requires:	%{name} = %{version}-%{release}
+Conflicts:	%{name} < 1.10.0-3
+
+%description -n pptp-command
+This package provides a command line tool for using PPTP.
 
 %package setup
 Summary:	PPTP Tunnel Configuration Script
@@ -59,12 +68,14 @@ install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 
 %files
 %doc AUTHORS NEWS README TODO USING Documentation/[D,P]*
-%{_sbindir}/pptp-*
 %{_sbindir}/pptp
 %{_mandir}/man8/pptp.8*
 %{_prefix}/lib/tmpfiles.d/pptp.conf
 %config(noreplace) %attr(0600,root,root) %{_sysconfdir}/ppp/options.pptp
 %attr(0755,root,root) %dir %{_sysconfdir}/pptp.d
+
+%files -n pptp-command
+%{_sbindir}/pptp-command
 
 %files setup
 %{_sbindir}/pptpsetup
