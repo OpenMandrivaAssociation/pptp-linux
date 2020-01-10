@@ -45,7 +45,7 @@ tunnels.
 
 %prep
 %setup -qn pptp-%{version}
-%apply_patches
+%autopatch -p1
 
 # Pacify rpmlint
 perl -pi -e 's/install -o root -m 555 pptp/install -m 755 pptp/;' Makefile
