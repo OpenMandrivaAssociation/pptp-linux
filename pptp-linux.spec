@@ -54,7 +54,7 @@ sed -i -e "/CFLAGS  =/ c\CFLAGS = %{optflags}" Makefile
 sed -i -e "/LDFLAGS =/ c\LDFLAGS = %{ldflags}" Makefile
 sed -i "s!gcc!%{__cc}!g" Makefile
 # adjust ip path
-sed -i 's#/bin/ip#/sbin/ip#' routing.c
+sed -i 's#/bin/ip#/sbin/ip#' routing.c Makefile
 
 %build
 %make_build
