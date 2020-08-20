@@ -25,15 +25,6 @@ but have not yet been performed). See the IPfwd page
 (http://www.pdos.lcs.mit.edu/~cananian/Projects/IPfwd) for information
 on tunnelling PPTP through Linux firewalls.
 
-%package -n pptp-command
-Summary:	PPTP Tunnel Command Line Script
-Group:		Networking/Other
-Requires:	%{name} = %{version}-%{release}
-Conflicts:	%{name} < 1.10.0-3
-
-%description -n pptp-command
-This package provides a command line tool for using PPTP.
-
 %package setup
 Summary:	PPTP Tunnel Configuration Script
 Group:		Networking/Other
@@ -43,28 +34,41 @@ Requires:	%{name} = %{version}-%{release}
 This package provides a simple configuration script for setting up PPTP
 tunnels.
 
+%package -n pptp-command
+Summary:       PPTP Tunnel Command Line Script
+Group:         Networking/Other
+Requires:      %{name} = %{version}-%{release}
+Conflicts:     %{name} < 1.10.0-3
+
+%description -n pptp-command
+This package provides a command line tool for using PPTP.
+
 %prep
 %setup -qn pptp-%{version}
 %autopatch -p1
 
 # Pacify rpmlint
 perl -pi -e 's/install -o root -m 555 pptp/install -m 755 pptp/;' Makefile
+# use our CFLAGS and LDFLAGS
+sed -i -e "/CFLAGS  =/ c\CFLAGS = %{optflags}" Makefile
+sed -i -e "/LDFLAGS =/ c\LDFLAGS = %{ldflags}" Makefile
+sed -i "s!gcc!%{__cc}!g" Makefile
+# adjust ip path
+sed -i 's#/bin/ip#/sbin/ip#' routing.c
 
 %build
-OUR_CFLAGS="-Wall %{optflags} -Wextra -Wstrict-aliasing=2 -Wnested-externs -Wstrict-prototypes"
-%make CFLAGS="$OUR_CFLAGS" IP=/sbin/ip
+%make_build
 
 %install
-%makeinstall_std
-install -d -m 750 %{buildroot}%{_localstatedir}/run/pptp
+%make_install
 
-install -m755 pptp -D %{buildroot}%{_sbindir}/pptp
-install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
+install -d -m 750 %{buildroot}%{_localstatedir}/run/pptp
 install -d %{buildroot}%{_sysconfdir}/pptp.d
 install -m644 %{SOURCE2} -D %{buildroot}%{_sysconfdir}/ppp/options.pptp
 install -m644 pptp.8 -D %{buildroot}%{_mandir}/man8/pptp.8
 install -d -m 755 %{buildroot}%{_prefix}/lib/tmpfiles.d
 install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
+install -m755 %{SOURCE1} -D %{buildroot}%{_sbindir}/pptp-command
 
 %files
 %doc AUTHORS NEWS README TODO USING Documentation/[D,P]*
@@ -74,9 +78,9 @@ install -p -m 644 %{SOURCE6} %{buildroot}%{_prefix}/lib/tmpfiles.d/pptp.conf
 %config(noreplace) %attr(0600,root,root) %{_sysconfdir}/ppp/options.pptp
 %attr(0755,root,root) %dir %{_sysconfdir}/pptp.d
 
-%files -n pptp-command
-%{_sbindir}/pptp-command
-
 %files setup
 %{_sbindir}/pptpsetup
 %{_mandir}/man8/pptpsetup.8*
+
+%files -n pptp-command
+%{_sbindir}/pptp-command
