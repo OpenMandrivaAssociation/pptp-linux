@@ -6,7 +6,7 @@ Version:	1.10.0
 Release:	4
 License:	GPLv2+
 Group:		Networking/Other
-Url:		http://pptpclient.sourceforge.net/
+Url:		https://pptpclient.sourceforge.net/
 Source0:	http://prdownloads.sourceforge.net/pptpclient/pptp-%{version}.tar.gz
 Source1:	pptp-command
 Source2:	options.pptp
