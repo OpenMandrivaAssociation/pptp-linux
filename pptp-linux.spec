@@ -17,6 +17,7 @@ Requires:	ppp >= 2.4.3
 Conflicts:	pptp-adsl-alcatel
 %rename		pptp-client
 
+BuildRequires:	make
 %description
 PPTP-linux allows you to connect to a PPTP server from a Linux or other
 Unix box (ports of pptp-linuxto other Unix variants should be trivial,
